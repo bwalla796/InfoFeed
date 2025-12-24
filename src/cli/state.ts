@@ -1,9 +1,11 @@
+import { UUID } from "crypto";
 import { getCommands } from "./index.js";
 import { createInterface, type Interface } from "readline";
 
 export type State = {
     interface: Interface;
     commands: Record<string, CLICommand>;
+    id: string | undefined
 }
 
 export type CLICommand = {
@@ -20,7 +22,8 @@ export function initState(): State {
             output: process.stdout,
             prompt: "TaskManager >"
         }),
-      commands: getCommands()
+      commands: getCommands(),
+      id: undefined
     }
 
     return rl;

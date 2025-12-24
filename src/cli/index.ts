@@ -4,7 +4,6 @@ import Stream from "node:stream";
 import * as readline from 'readline';
 import { middlewareLogResponses, middlewareMetricsInc } from "../middleware";
 import { handlerStats, handlerResetTasks } from "../admin";
-import { handlerGetTasks, handlerUpsertTasks, handlerDeleteTasks } from "../tasks";
 import * as cmds from "./commands.js"
 import { CLICommand } from "./state.js";
 import { State } from "./state.js"
@@ -59,13 +58,9 @@ export async function startREPL(state: State): Promise<void> {
         const commandName = cl_inp[0]
         const commands = state.commands;
         const cmd = commands[commandName];
-        if(commandName == "explore" || commandName == "catch") {
+        if(commandName == "update" || commandName == "delete") {
           if (cl_inp.length == 2) {
-            if(commandName == "explore") {
-              state.location = cl_inp[1];
-            } else if (commandName == "catch" || commandName == "inspect") {
-              state.pokemonAttempt = cl_inp[1];
-            }
+            state.id = cl_inp[1];
           } else {
             console.log(
               `Invalid command arguments: "${commandName}". Format should be "${commandName} {name/ID}"`,
