@@ -30,7 +30,7 @@ export function getCommands(): Record<string, CLICommand> {
     update: {
       name: "update",
       description: "Updates a task",
-      callback: cmds.update
+      callback: cmds.upsert
     },
     delete: {
       name: "delete",
@@ -60,7 +60,7 @@ export async function startREPL(state: State): Promise<void> {
         const cmd = commands[commandName];
         if(commandName == "update" || commandName == "delete") {
           if (cl_inp.length == 2) {
-            state.id = cl_inp[1];
+            state.taskId = cl_inp[1];
           } else {
             console.log(
               `Invalid command arguments: "${commandName}". Format should be "${commandName} {name/ID}"`,

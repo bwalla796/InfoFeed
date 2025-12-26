@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, assertDbConnection } from "../api/index.js";
+import { db, assertDbConnection } from "../main.js";
 import { users, NewUser } from "./schema.js";
 
 export async function createUser(user: NewUser) {

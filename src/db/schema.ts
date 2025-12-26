@@ -10,6 +10,7 @@ export const users = sqliteTable("users", {
     .$onUpdate(() => sql`(unixepoch())`),
   email: text("email", { length: 256 }).unique().notNull(),
   hashedPassword: text("hashed_password", { length: 512 }).default("unset").notNull(),
+  apiKey: text("api_key", { length: 512 }).unique().notNull(),
 });
 
 export type NewUser = typeof users.$inferInsert;
