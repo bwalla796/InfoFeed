@@ -7,12 +7,18 @@ import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
-const client = createClient({ url: process.env.DB_FILE_NAME! });
-const db = drizzle({ client });
+export const client = createClient({ url: process.env.DB_FILE_NAME! });
+export const db = drizzle({ client });
 
 const app = express();
 
-const PORT = 8080;
+export function assertDbConnection() {
+  if (!db) {
+    throw new Error("Database connection is not available");
+  }
+}
+
+const PORT = process.env.PORT;
 
 app.use(middlewareLogResponses);
 app.use(express.json())

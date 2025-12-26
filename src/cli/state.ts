@@ -1,11 +1,23 @@
 import { UUID } from "crypto";
 import { getCommands } from "./index.js";
 import { createInterface, type Interface } from "readline";
+import { getTasks, updateTask, deleteTask, createTask } from "src/db/tasks.js";
+import { NewTask } from "src/db/schema.js";
 
 export type State = {
     interface: Interface;
     commands: Record<string, CLICommand>;
-    id: string | undefined
+    userId: string | undefined,
+    taskId: string | undefined,
+    taskTitle: string | undefined,
+    taskDescription: string | undefined,
+    taskStatus: string | undefined,
+    db: {
+      getTasks: (id?: string) => Promise<any>;
+      updateTask: (updates: Partial<any>, id?: string) => Promise<any>;
+      deleteTask: (id: string) => Promise<NewTask>;
+      createTask: (task: NewTask) => Promise<NewTask>;
+    };
 }
 
 export type CLICommand = {
@@ -23,7 +35,17 @@ export function initState(): State {
             prompt: "TaskManager >"
         }),
       commands: getCommands(),
-      id: undefined
+      userId: undefined,
+      taskId: undefined,
+      taskTitle: undefined,
+      taskDescription: undefined,
+      taskStatus: undefined,
+      db: {
+        getTasks,
+        updateTask,
+        deleteTask,
+        createTask,
+      },
     }
 
     return rl;

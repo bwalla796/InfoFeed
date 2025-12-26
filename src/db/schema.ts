@@ -1,29 +1,30 @@
-import { pgTable, timestamp, varchar, uuid, text, boolean } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: 'timestamp' })
     .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  email: varchar("email", { length: 256 }).unique().notNull(),
-  hashedPassword: varchar("hashed_password", { length: 512 }).default("unset").notNull(),
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => sql`(unixepoch())`),
+  email: text("email", { length: 256 }).unique().notNull(),
+  hashedPassword: text("hashed_password", { length: 512 }).default("unset").notNull(),
 });
 
 export type NewUser = typeof users.$inferInsert;
 
-export const tasks = pgTable("tasks", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
+export const tasks = sqliteTable("tasks", {
+  id: text("id").primaryKey(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: 'timestamp' })
     .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  title: varchar("title", { length: 124 }).notNull(),
-  description: varchar("body", { length: 512 }).notNull(),
-  userId: uuid("user_id").notNull().references(() => users.id, {onDelete: 'cascade'})
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => sql`(unixepoch())`),
+  title: text("title", { length: 124 }).default("Default").notNull(),
+  description: text("body", { length: 512 }).default("No Description").notNull(),
+  status: text("status", { length: 124 }).default("pending").notNull(),
+  userId: text("user_id").notNull().references(() => users.id, {onDelete: 'cascade'})
 });
 
 export type NewTask = typeof tasks.$inferInsert;
