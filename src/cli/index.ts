@@ -8,6 +8,9 @@ import * as cmds from "./commands.js"
 import { CLICommand } from "./state.js";
 import { State } from "./state.js";
 import { getUserByEmail, createUser } from "src/db/users.js";
+import { check } from "drizzle-orm/gel-core";
+import { hashPassword, checkPasswordHash } from "src/auth.js";
+import { hash } from "node:crypto";
 
 export async function loginUser(state: State): Promise<void> {
   while(!state.userId) {
@@ -15,8 +18,8 @@ export async function loginUser(state: State): Promise<void> {
     let potential_user = await getUserByEmail(input_email);
     if (potential_user) {
       let input_password = await state.interface.question('Please enter your password: ');
-      let hashed_password = input_password; // TODO: Hash password
-      if (hashed_password !== potential_user.hashedPassword) {
+      const pwd_match = await checkPasswordHash(input_password, potential_user.hashedPassword);
+      if (!pwd_match) {
         console.log("Incorrect password. Please try again.");
         continue;
       }
@@ -27,7 +30,7 @@ export async function loginUser(state: State): Promise<void> {
       const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
       if (create_new.toLowerCase() === 'y') {
         let input_password = await state.interface.question('Please enter a password: ');
-        let hashed_password = input_password; // TODO: Hash password
+        let hashed_password = await hashPassword(input_password);
         potential_user = await createUser({
           id: crypto.randomUUID(),
           email: input_email,

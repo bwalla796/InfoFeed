@@ -29,3 +29,17 @@ export const tasks = sqliteTable("tasks", {
 });
 
 export type NewTask = typeof tasks.$inferInsert;
+
+export const refreshTokens = sqliteTable("refresh_tokens", {
+    token: text("id").primaryKey(),
+    createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`)
+      .$onUpdate(() => sql`(unixepoch())`),
+    expiresAt: integer("expires_at", { mode: 'timestamp' }).notNull(),
+    revokedAt: integer("revoked_at", { mode: 'timestamp' }),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade' })
+});
+
+export type NewRefreshToken = typeof refreshTokens.$inferInsert;

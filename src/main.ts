@@ -11,15 +11,15 @@ import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 
+//starts CLI REPL loop
 function main() {
   const state = initState();
   startREPL(state);
 }
 
+//Initialize database connection
 export const client = createClient({ url: process.env.DB_FILE_NAME! });
 export const db = drizzle({ client });
-
-const app = express();
 
 export function assertDbConnection() {
   if (!db) {
@@ -28,6 +28,8 @@ export function assertDbConnection() {
 }
 
 
+//API routes
+const app = express();
 
 app.use(middlewareLogResponses);
 app.use(express.json())

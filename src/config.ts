@@ -8,6 +8,9 @@ type Config = {
 
 type APIConfig = {
   port: string | undefined;
+  jwt: {
+    secret: string | undefined;
+  }
 };
 
 type DBConfig = {
@@ -16,7 +19,10 @@ type DBConfig = {
 
 export const config: Config = {
   api: {
-    port: process.env.PORT
+    port: process.env.PORT,
+    jwt: {
+      secret: process.env.JWT_SECRET
+    }
   },
   db: {
     url: process.env.DB_FILE_NAME,
