@@ -30,8 +30,11 @@ export async function list(state: State) {
     console.log("No tasks found.");
     return;
   }
+  console.log("----------------------------------------------------------------------");
+  console.log("|  Title               | Description                    | Status    |");
+  console.log("----------------------------------------------------------------------"); 
   tasks.forEach((task: NewTask) => {
-    console.log(`- [${task.id}] ${task.title}: ${task.description}`);
+    console.log(`| ${task.title}    | ${task.description}   | ${task.status} |`);
   });
 }
 

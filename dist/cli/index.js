@@ -74,6 +74,7 @@ const commands = getCommands();
 export async function startREPL(state) {
     console.log("Welcome to Task Manager! Please login. A user profile will be created if one does not already exist.");
     await loginUser(state);
+    state.interface.prompt();
     state.interface.on("line", async (input) => {
         let cl_inp = cleanInput(input);
         if (cl_inp.length == 0) {

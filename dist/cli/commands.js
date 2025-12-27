@@ -25,8 +25,11 @@ export async function list(state) {
         console.log("No tasks found.");
         return;
     }
+    console.log("----------------------------------------------------------------------");
+    console.log("|  Title               | Description                    | Status    |");
+    console.log("----------------------------------------------------------------------");
     tasks.forEach((task) => {
-        console.log(`- [${task.id}] ${task.title}: ${task.description}`);
+        console.log(`| ${task.title}    | ${task.description}   | ${task.status} |`);
     });
 }
 export async function upsert(state) {
