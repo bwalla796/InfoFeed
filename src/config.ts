@@ -8,7 +8,6 @@ type Config = {
 
 type APIConfig = {
   port: string | undefined;
-  filepathRoot: string;
 };
 
 type DBConfig = {
@@ -17,8 +16,7 @@ type DBConfig = {
 
 export const config: Config = {
   api: {
-    port: process.env.PORT,
-    filepathRoot: "./src/assets",
+    port: process.env.PORT
   },
   db: {
     url: process.env.DB_FILE_NAME,

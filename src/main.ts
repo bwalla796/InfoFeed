@@ -4,7 +4,7 @@ import { getCommands, startREPL } from "./cli/index.js";
 import { initState, State } from "./cli/state.js";
 import express from "express";
 import { middlewareLogResponses, middlewareMetricsInc } from "./middleware.js";
-import { handlerStats, handlerResetTasks } from "./admin.js";
+import { handlerStats, handlerResetTasks } from "./api/adminHandlers.js";
 import { handlerGetTasks, handlerUpsertTasks, handlerDeleteTasks } from "./api/taskHandlers.js";
 import { handlerError } from "./errors.js";
 import 'dotenv/config';
@@ -33,11 +33,11 @@ app.use(middlewareLogResponses);
 app.use(express.json())
 //app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
-app.get("/admin/metrics", handlerStats);
-app.post("/admin/reset", handlerResetTasks);
+app.get("/admin/metrics", middlewareLogResponses, handlerStats);
+app.post("/admin/reset", middlewareLogResponses, handlerResetTasks);
 
 
-app.get("/api/tasks/:id",  handlerGetTasks);
+app.get("/api/tasks/:id", middlewareLogResponses, handlerGetTasks);
 app.post("/api/tasks", middlewareLogResponses, handlerUpsertTasks);
 app.delete("/api/tasks/:id", middlewareLogResponses, handlerDeleteTasks);
 app.use(handlerError);

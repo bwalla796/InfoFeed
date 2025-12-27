@@ -3,7 +3,7 @@ import { stdin, stdout } from "node:process";
 import Stream from "node:stream";
 import * as readline from 'node:readline/promises';
 import { middlewareLogResponses, middlewareMetricsInc } from "../middleware";
-import { handlerStats, handlerResetTasks } from "../admin";
+import { handlerStats, handlerResetTasks } from "../api/adminHandlers";
 import * as cmds from "./commands.js"
 import { CLICommand } from "./state.js";
 import { State } from "./state.js";

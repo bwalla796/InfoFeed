@@ -25,7 +25,7 @@ export async function getTasks(id?: string) {
     const rows = await db!
       .select()
       .from(tasks);
-    return await rows
+    return rows
   }
 }
 
@@ -46,8 +46,12 @@ export async function updateTask(updates: Partial<NewTask> = {}, id?: string) {
   return rows[0];
 }
 
-export async function deleteTask(id: string) {
+export async function deleteTask(id?: string) {
   assertDbConnection();
+  if (!id) {
+    const rows = await db!.delete(tasks).returning();
+    return rows;
+  }
   const rows = await db!.delete(tasks).where(eq(tasks.id, id)).returning();
   if (rows.length === 0) {
     throw new Error("Failed to delete task");
