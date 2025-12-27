@@ -3,16 +3,23 @@ import type { State } from "./state";
 import { NewTask } from "src/db/schema";
 
 export async function exit(state: State) {
-  console.log("Exiting Tasks");
+  console.log("Exiting Task Manager. Thanks for stopping by!");
   state.interface.close();
   process.exit(0);
 }
 
 export async function help(state: State) {
-    console.log("Welcome to the Pokedex!");
     console.log("Usage:\n");
   for (let command in state.commands) {
-      console.log(`${state.commands[command].name}: ${state.commands[command].description}\n`)
+      if (state.commands[command].name === "upsert") {
+        console.log(`${state.commands[command].name} <taskId?>: ${state.commands[command].description}\n`);
+      }
+      else if (state.commands[command].name === "delete") {
+        console.log(`${state.commands[command].name} <taskId>: ${state.commands[command].description}\n`);
+      } 
+      else {
+        console.log(`${state.commands[command].name}: ${state.commands[command].description}\n`)
+      }
   }
 };
 

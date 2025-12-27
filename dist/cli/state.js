@@ -1,6 +1,6 @@
 import { getCommands } from "./index.js";
 import { createInterface } from "readline";
-import { getTasks, updateTask, deleteTask, createTask } from "src/db/tasks.js";
+import { getTasks, updateTask, deleteTask, createTask } from "../db/tasks.js";
 export function initState() {
     // Create a readline interface
     const rl = {

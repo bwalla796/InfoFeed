@@ -1,10 +1,10 @@
 import { startREPL } from "./cli/index.js";
 import { initState } from "./cli/state.js";
 import express from "express";
-import { middlewareLogResponses } from "./middleware";
-import { handlerStats, handlerResetTasks } from "./admin";
+import { middlewareLogResponses } from "./middleware.js";
+import { handlerStats, handlerResetTasks } from "./admin.js";
 import { handlerGetTasks, handlerUpsertTasks, handlerDeleteTasks } from "./api/taskHandlers.js";
-import { handlerError } from "./errors";
+import { handlerError } from "./errors.js";
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
@@ -20,7 +20,6 @@ export function assertDbConnection() {
         throw new Error("Database connection is not available");
     }
 }
-const PORT = process.env.PORT;
 app.use(middlewareLogResponses);
 app.use(express.json());
 //app.use("/app", middlewareMetricsInc, express.static("./src/app"));
@@ -30,6 +29,7 @@ app.get("/api/tasks/:id", handlerGetTasks);
 app.post("/api/tasks", middlewareLogResponses, handlerUpsertTasks);
 app.delete("/api/tasks/:id", middlewareLogResponses, handlerDeleteTasks);
 app.use(handlerError);
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });

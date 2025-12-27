@@ -1,8 +1,8 @@
 import { UUID } from "crypto";
 import { getCommands } from "./index.js";
-import { createInterface, type Interface } from "readline";
-import { getTasks, updateTask, deleteTask, createTask } from "src/db/tasks.js";
-import { NewTask } from "src/db/schema.js";
+import { createInterface, type Interface } from "node:readline/promises";
+import { getTasks, updateTask, deleteTask, createTask } from "../db/tasks.js";
+import { NewTask } from "../db/schema.js";
 
 export type State = {
     interface: Interface;

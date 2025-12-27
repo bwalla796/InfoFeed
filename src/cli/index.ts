@@ -1,14 +1,48 @@
 import { relative } from "node:path";
 import { stdin, stdout } from "node:process";
 import Stream from "node:stream";
-import * as readline from 'readline';
+import * as readline from 'node:readline/promises';
 import { middlewareLogResponses, middlewareMetricsInc } from "../middleware";
 import { handlerStats, handlerResetTasks } from "../admin";
 import * as cmds from "./commands.js"
 import { CLICommand } from "./state.js";
-import { State } from "./state.js"
+import { State } from "./state.js";
+import { getUserByEmail, createUser } from "src/db/users.js";
 
-
+export async function loginUser(state: State): Promise<void> {
+  while(!state.userId) {
+    const input_email = await state.interface.question('Please enter your email: ');
+    let potential_user = await getUserByEmail(input_email);
+    if (potential_user) {
+      let input_password = await state.interface.question('Please enter your password: ');
+      let hashed_password = input_password; // TODO: Hash password
+      if (hashed_password !== potential_user.hashedPassword) {
+        console.log("Incorrect password. Please try again.");
+        continue;
+      }
+      console.log(`Welcome back, ${input_email}!`);
+      state.userId = potential_user.id;
+    } else {
+      console.log("User not found.");
+      const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
+      if (create_new.toLowerCase() === 'y') {
+        let input_password = await state.interface.question('Please enter a password: ');
+        let hashed_password = input_password; // TODO: Hash password
+        potential_user = await createUser({
+          id: crypto.randomUUID(),
+          email: input_email,
+          hashedPassword: hashed_password,
+          apiKey: crypto.randomUUID(), // TODO: add JWT logic
+        });
+        state.userId = potential_user.id;
+        console.log(`User profile created. Welcome!`);
+      } else {
+        console.log("Okay, let's try again.");
+        continue;
+      }
+    }
+  }
+}
 
 export function getCommands(): Record<string, CLICommand> {
   return {
@@ -27,14 +61,14 @@ export function getCommands(): Record<string, CLICommand> {
       description: "Lists tasks",
       callback: cmds.list
     },
-    update: {
-      name: "update",
-      description: "Updates a task",
+    upsert: {
+      name: "upsert",
+      description: "Creates a task or updates an existing task if given a valid ID",
       callback: cmds.upsert
     },
     delete: {
       name: "delete",
-      description: "Deletes a task by id",
+      description: "Deletes a task by ID",
       callback: cmds.remove
     }
   }
@@ -47,7 +81,8 @@ export function cleanInput(input: string): string[] {
 let commands = getCommands();
 
 export async function startREPL(state: State): Promise<void> {
-  state.interface.prompt();
+  console.log("Welcome to Task Manager! Please login. A user profile will be created if one does not already exist.");
+  await loginUser(state);
 
   state.interface.on("line", async (input) => {
     let cl_inp = cleanInput(input)
@@ -58,7 +93,7 @@ export async function startREPL(state: State): Promise<void> {
         const commandName = cl_inp[0]
         const commands = state.commands;
         const cmd = commands[commandName];
-        if(commandName == "update" || commandName == "delete") {
+        if(commandName == "delete") {
           if (cl_inp.length == 2) {
             state.taskId = cl_inp[1];
           } else {
@@ -68,6 +103,13 @@ export async function startREPL(state: State): Promise<void> {
             state.interface.prompt();
             return;
           }
+        }
+        if(commandName == "upsert") {
+          if (cl_inp.length >= 2) {
+            state.taskId = cl_inp[1];
+          }
+          state.taskTitle = await state.interface.question("Please enter a title for the task:");
+          state.taskDescription = await state.interface.question("Please enter a description for the task:");
         }
         if (!cmd) {
           console.log(
