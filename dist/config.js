@@ -3,7 +3,9 @@ dotenv.config();
 export const config = {
     api: {
         port: process.env.PORT,
-        filepathRoot: "./src/assets",
+        jwt: {
+            secret: process.env.JWT_SECRET
+        }
     },
     db: {
         url: process.env.DB_FILE_NAME,

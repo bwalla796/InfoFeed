@@ -1,4 +1,43 @@
 import * as cmds from "./commands.js";
+import { getUserByEmail, createUser } from "../db/users.js";
+import { hashPassword, checkPasswordHash } from "../auth.js";
+import crypto from "crypto";
+export async function loginUser(state) {
+    while (!state.userId) {
+        const input_email = await state.interface.question('Please enter your email: ');
+        let potential_user = await getUserByEmail(input_email);
+        if (potential_user) {
+            let input_password = await state.interface.question('Please enter your password: ');
+            const pwd_match = await checkPasswordHash(input_password, potential_user.hashedPassword);
+            if (!pwd_match) {
+                console.log("Incorrect password. Please try again.");
+                continue;
+            }
+            console.log(`Welcome back, ${input_email}!`);
+            state.userId = potential_user.id;
+        }
+        else {
+            console.log("User not found.");
+            const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
+            if (create_new.toLowerCase() === 'y') {
+                let input_password = await state.interface.question('Please enter a password: ');
+                let hashed_password = await hashPassword(input_password);
+                potential_user = await createUser({
+                    id: crypto.randomUUID(),
+                    email: input_email,
+                    hashedPassword: hashed_password,
+                    apiKey: crypto.randomUUID(), // TODO: add JWT logic
+                });
+                state.userId = potential_user.id;
+                console.log(`User profile created. Welcome!`);
+            }
+            else {
+                console.log("Okay, let's try again.");
+                continue;
+            }
+        }
+    }
+}
 export function getCommands() {
     return {
         exit: {
@@ -31,10 +70,10 @@ export function getCommands() {
 export function cleanInput(input) {
     return input.trim().toLowerCase().split(" ").filter(elem => elem.length != 0);
 }
-let commands = getCommands();
+const commands = getCommands();
 export async function startREPL(state) {
-    console.log("Welcome Task Manager! Please enter a command. Type 'help' for a list of commands.");
-    state.interface.prompt();
+    console.log("Welcome to Task Manager! Please login. A user profile will be created if one does not already exist.");
+    await loginUser(state);
     state.interface.on("line", async (input) => {
         let cl_inp = cleanInput(input);
         if (cl_inp.length == 0) {
@@ -58,14 +97,8 @@ export async function startREPL(state) {
             if (cl_inp.length >= 2) {
                 state.taskId = cl_inp[1];
             }
-            console.log("Please enter a title for the task:");
-            state.interface.question("> ", async (title) => {
-                state.taskTitle = title;
-            });
-            console.log("Please enter a description for the task:");
-            state.interface.question("> ", async (description) => {
-                state.taskDescription = description;
-            });
+            state.taskTitle = await state.interface.question("Please enter a title for the task:");
+            state.taskDescription = await state.interface.question("Please enter a description for the task:");
         }
         if (!cmd) {
             console.log(`Unknown command: "${commandName}". Type "help" for a list of commands.`);

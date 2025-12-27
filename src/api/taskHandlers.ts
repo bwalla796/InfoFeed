@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createTask, deleteTask, getTasks, updateTask } from "src/db/tasks";
+import { createTask, deleteTask, getTasks, updateTask } from "../db/tasks.js";
 
 export async function handlerGetTasks(req: Request, res: Response, next: NextFunction) {
     const tasks = await getTasks();

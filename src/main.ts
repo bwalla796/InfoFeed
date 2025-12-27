@@ -1,7 +1,5 @@
-// repl.js actually refers to repl.ts
-import readline from "node:readline";
-import { getCommands, startREPL } from "./cli/index.js";
-import { initState, State } from "./cli/state.js";
+import { startREPL } from "./cli/index.js";
+import { initState } from "./cli/state.js";
 import express from "express";
 import { middlewareLogResponses, middlewareMetricsInc } from "./middleware.js";
 import { handlerStats, handlerResetTasks } from "./api/adminHandlers.js";

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { makeJWT, getRefreshToken, revokeRefreshToken } from "src/auth.js";
-import { config } from "src/config.js";
+import { makeJWT, getRefreshToken, revokeRefreshToken } from "./auth.js";
+import { config } from "./config.js";
 
 export async function handlerRefresh(req: Request, res: Response, next: NextFunction) {
     try {

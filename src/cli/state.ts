@@ -15,7 +15,7 @@ export type State = {
     db: {
       getTasks: (id?: string) => Promise<any>;
       updateTask: (updates: Partial<any>, id?: string) => Promise<any>;
-      deleteTask: (id: string) => Promise<NewTask>;
+      deleteTask: (id: string) => Promise<NewTask | NewTask[]>;
       createTask: (task: NewTask) => Promise<NewTask>;
     };
 }
@@ -27,7 +27,6 @@ export type CLICommand = {
 }
 
 export function initState(): State {
-    // Create a readline interface
     const rl = {
       interface:  createInterface({
             input: process.stdin,

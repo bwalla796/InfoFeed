@@ -7,10 +7,9 @@ import { handlerStats, handlerResetTasks } from "../api/adminHandlers";
 import * as cmds from "./commands.js"
 import { CLICommand } from "./state.js";
 import { State } from "./state.js";
-import { getUserByEmail, createUser } from "src/db/users.js";
-import { check } from "drizzle-orm/gel-core";
-import { hashPassword, checkPasswordHash } from "src/auth.js";
-import { hash } from "node:crypto";
+import { getUserByEmail, createUser } from "../db/users.js";
+import { hashPassword, checkPasswordHash } from "../auth.js";
+import crypto from "crypto";
 
 export async function loginUser(state: State): Promise<void> {
   while(!state.userId) {
@@ -81,11 +80,13 @@ export function cleanInput(input: string): string[] {
   return input.trim().toLowerCase().split(" ").filter(elem => elem.length != 0);
 }
 
-let commands = getCommands();
+const commands = getCommands();
 
 export async function startREPL(state: State): Promise<void> {
   console.log("Welcome to Task Manager! Please login. A user profile will be created if one does not already exist.");
   await loginUser(state);
+
+  state.interface.prompt();
 
   state.interface.on("line", async (input) => {
     let cl_inp = cleanInput(input)
