@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db, assertDbConnection } from "../main.js";
 import { tasks } from "./schema.js";
 export async function createTask(task) {
@@ -9,19 +9,16 @@ export async function createTask(task) {
     }
     return rows[0];
 }
-export async function getTasks(id) {
+export async function getTasks(id, userId, title) {
     assertDbConnection();
-    if (id) {
-        const rows = await db
-            .select()
-            .from(tasks)
-            .where(eq(tasks.id, id));
+    const rows = await db
+        .select()
+        .from(tasks)
+        .where(and(id ? eq(tasks.id, id) : undefined, userId ? eq(tasks.userId, userId) : undefined, title ? eq(tasks.title, title) : undefined));
+    if (id || title) {
         return rows.length > 0 ? rows[0] : null;
     }
     else {
-        const rows = await db
-            .select()
-            .from(tasks);
         return rows;
     }
 }

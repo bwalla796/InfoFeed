@@ -1,3 +1,4 @@
+import { getTasks } from "../db/tasks.js";
 export async function exit(state) {
     console.log("Exiting Task Manager. Thanks for stopping by!");
     state.interface.close();
@@ -20,16 +21,16 @@ export async function help(state) {
 ;
 export async function list(state) {
     console.log("Listing all tasks:");
-    const tasks = await state.db.getTasks();
-    if (tasks.length === 0) {
+    const tasks = await getTasks(undefined, state.userId, undefined);
+    if ((Array.isArray(tasks) && tasks.length === 0) || !Array.isArray(tasks)) {
         console.log("No tasks found.");
         return;
     }
-    console.log("----------------------------------------------------------------------");
-    console.log("|  Title               | Description                    | Status    |");
-    console.log("----------------------------------------------------------------------");
+    console.log("----------------------------------------------------------------------------");
+    console.log("|  Title               | Description                    | Status     | ID  |");
+    console.log("----------------------------------------------------------------------------");
     tasks.forEach((task) => {
-        console.log(`| ${task.title}    | ${task.description}   | ${task.status} |`);
+        console.log(`| ${task.title}    | ${task.description}   | ${task.status} | ${task.id} |`);
     });
 }
 export async function upsert(state) {
@@ -38,12 +39,14 @@ export async function upsert(state) {
         return;
     }
     let upsertedTask;
-    if (state.taskId) {
+    const taskMatches = await getTasks(undefined, state.userId, state.taskTitle);
+    if (taskMatches) {
+        const id = Array.isArray(taskMatches) ? taskMatches[0].id : taskMatches.id;
         upsertedTask = await state.db.updateTask({
             title: state.taskTitle,
             description: state.taskDescription,
             status: state.taskStatus,
-        }, state.taskId);
+        }, id);
     }
     else {
         upsertedTask = await state.db.createTask({
@@ -54,11 +57,11 @@ export async function upsert(state) {
             status: state.taskStatus,
         });
     }
-    if (!state.taskId) {
+    if (!taskMatches) {
         console.log(`Task created with ID: ${upsertedTask.id}`);
     }
     else {
-        console.log(`Task with ID ${state.taskId} has been updated.`);
+        console.log(`Task with ID ${upsertedTask.id} has been updated.`);
     }
 }
 export async function remove(state) {

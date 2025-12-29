@@ -1,6 +1,8 @@
 import { stat } from "node:fs";
-import type { State } from "./state";
-import { NewTask } from "src/db/schema";
+import type { State } from "./state.js";
+import { NewTask } from "../db/schema.js";
+import { get } from "node:http";
+import { getTasks } from "../db/tasks.js";
 
 export async function exit(state: State) {
   console.log("Exiting Task Manager. Thanks for stopping by!");
@@ -25,16 +27,16 @@ export async function help(state: State) {
 
 export async function list(state: State) {
   console.log("Listing all tasks:");
-  const tasks = await state.db.getTasks();
-  if (tasks.length === 0) {
+  const tasks = await getTasks(undefined, state.userId, undefined);
+  if ((Array.isArray(tasks) && tasks.length === 0) || !Array.isArray(tasks)) {
     console.log("No tasks found.");
     return;
   }
-  console.log("----------------------------------------------------------------------");
-  console.log("|  Title               | Description                    | Status    |");
-  console.log("----------------------------------------------------------------------"); 
+  console.log("----------------------------------------------------------------------------");
+  console.log("|  Title               | Description                    | Status     | ID  |");
+  console.log("----------------------------------------------------------------------------"); 
   tasks.forEach((task: NewTask) => {
-    console.log(`| ${task.title}    | ${task.description}   | ${task.status} |`);
+    console.log(`| ${task.title}    | ${task.description}   | ${task.status} | ${task.id} |`);
   });
 }
 
@@ -45,12 +47,14 @@ export async function upsert(state: State) {
   }
   
   let upsertedTask: NewTask;
-  if(state.taskId) {
+  const taskMatches = await getTasks(undefined, state.userId, state.taskTitle);
+  if(taskMatches) {
+    const id = Array.isArray(taskMatches) ? taskMatches[0].id : taskMatches.id;
     upsertedTask = await state.db.updateTask({
       title: state.taskTitle,
       description: state.taskDescription,
       status: state.taskStatus,
-    }, state.taskId);
+    }, id);
   } else {
     upsertedTask = await state.db.createTask({
       id: crypto.randomUUID(),
@@ -61,10 +65,10 @@ export async function upsert(state: State) {
     });
   }
 
-  if(!state.taskId) {
+  if(!taskMatches) {
     console.log(`Task created with ID: ${upsertedTask.id}`);
   } else {
-    console.log(`Task with ID ${state.taskId} has been updated.`);
+    console.log(`Task with ID ${upsertedTask.id} has been updated.`);
   }
 
 }

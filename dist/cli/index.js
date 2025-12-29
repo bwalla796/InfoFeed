@@ -2,12 +2,15 @@ import * as cmds from "./commands.js";
 import { getUserByEmail, createUser } from "../db/users.js";
 import { hashPassword, checkPasswordHash } from "../auth.js";
 import crypto from "crypto";
+import * as readlineSync from "readline-sync";
 export async function loginUser(state) {
     while (!state.userId) {
         const input_email = await state.interface.question('Please enter your email: ');
         let potential_user = await getUserByEmail(input_email);
         if (potential_user) {
-            let input_password = await state.interface.question('Please enter your password: ');
+            let input_password = await readlineSync.question('Please enter your password: ', {
+                hideEchoBack: true
+            });
             const pwd_match = await checkPasswordHash(input_password, potential_user.hashedPassword);
             if (!pwd_match) {
                 console.log("Incorrect password. Please try again.");
@@ -20,7 +23,9 @@ export async function loginUser(state) {
             console.log("User not found.");
             const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
             if (create_new.toLowerCase() === 'y') {
-                let input_password = await state.interface.question('Please enter a password: ');
+                let input_password = await readlineSync.question('Please enter a password: ', {
+                    hideEchoBack: true
+                });
                 let hashed_password = await hashPassword(input_password);
                 potential_user = await createUser({
                     id: crypto.randomUUID(),
@@ -100,6 +105,7 @@ export async function startREPL(state) {
             }
             state.taskTitle = await state.interface.question("Please enter a title for the task:");
             state.taskDescription = await state.interface.question("Please enter a description for the task:");
+            state.taskStatus = await state.interface.question("Please enter a status for the task:");
         }
         if (!cmd) {
             console.log(`Unknown command: "${commandName}". Type "help" for a list of commands.`);

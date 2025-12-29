@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db, assertDbConnection } from "../main.js";
 import { tasks, NewTask } from "./schema.js";
 import { UUID } from "node:crypto";
@@ -13,19 +13,20 @@ export async function createTask(task: NewTask) {
   return rows[0];
 }
 
-export async function getTasks(id?: string) {
+export async function getTasks(id?: string, userId?: string, title?: string) {
   assertDbConnection();
-  if (id) {
-    const rows = await db!
-        .select()
-        .from(tasks)
-        .where(eq(tasks.id, id));
-      return rows.length > 0 ? rows[0] : null;
+  const rows = await db!
+    .select()
+    .from(tasks)
+    .where(and(
+      id ? eq(tasks.id, id) : undefined,
+      userId ? eq(tasks.userId, userId) : undefined,
+      title ? eq(tasks.title, title) : undefined
+    ));
+  if (id || title) {
+    return rows.length > 0 ? rows[0] : null;
   } else {
-    const rows = await db!
-      .select()
-      .from(tasks);
-    return rows
+    return rows;
   }
 }
 
