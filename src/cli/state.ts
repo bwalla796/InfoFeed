@@ -31,7 +31,7 @@ export function initState(): State {
       interface:  createInterface({
             input: process.stdin,
             output: process.stdout,
-            prompt: "TaskManager >"
+            prompt: "Tasky >"
         }),
       commands: getCommands(),
       userId: undefined,

@@ -5,7 +5,7 @@ import { get } from "node:http";
 import { getTasks } from "../db/tasks.js";
 
 export async function exit(state: State) {
-  console.log("Exiting Task Manager. Thanks for stopping by!");
+  console.log("Exiting Tasky. Thanks for stopping by!");
   state.interface.close();
   process.exit(0);
 }
