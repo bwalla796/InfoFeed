@@ -16,8 +16,8 @@ function main() {
 }
 
 //Initialize database connection
-export const client = createClient({ url: process.env.DB_FILE_NAME! });
-export const db = drizzle({ client });
+export const client = process.env.DB_FILE_NAME ? createClient({ url: process.env.DB_FILE_NAME }) : null;
+export const db = client ? drizzle({ client }) : null;
 
 export function assertDbConnection() {
   if (!db) {
