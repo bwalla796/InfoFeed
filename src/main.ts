@@ -41,9 +41,10 @@ app.use(handlerError);
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-
-  main();
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+    main();
+  });
+}
 
