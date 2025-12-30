@@ -1,7 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../main.js";
 import { tasks, NewTask } from "./schema.js";
-import { UUID } from "node:crypto";
 
 export async function createTask(task: NewTask) {
   const rows = await db.insert(tasks).values(task).returning();
@@ -24,7 +23,7 @@ export async function getTasks(id?: string, userId?: string, title?: string) {
       ),
     );
   if (id || title) {
-    return rows.length > 0 ? rows[0] : null;
+    return rows.length > 0 ? rows[0] : [];
   } else {
     return rows;
   }

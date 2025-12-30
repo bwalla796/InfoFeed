@@ -1,4 +1,3 @@
-import { UUID } from "crypto";
 import { getCommands } from "./index.js";
 import { createInterface, type Interface } from "node:readline/promises";
 import { getTasks, updateTask, deleteTask, createTask } from "../db/tasks.js";
@@ -13,8 +12,8 @@ export type State = {
   taskDescription: string | undefined;
   taskStatus: string | undefined;
   db: {
-    getTasks: (id?: string) => Promise<any>;
-    updateTask: (updates: Partial<any>, id?: string) => Promise<any>;
+    getTasks: (id?: string) => Promise<NewTask | NewTask[]>;
+    updateTask: (updates: Partial<NewTask>, id?: string) => Promise<NewTask>;
     deleteTask: (id: string) => Promise<NewTask | NewTask[]>;
     createTask: (task: NewTask) => Promise<NewTask>;
   };

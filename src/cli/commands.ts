@@ -1,7 +1,5 @@
-import { stat } from "node:fs";
 import type { State } from "./state.js";
 import { NewTask } from "../db/schema.js";
-import { get } from "node:http";
 import { getTasks } from "../db/tasks.js";
 
 export async function exit(state: State) {
@@ -12,7 +10,7 @@ export async function exit(state: State) {
 
 export async function help(state: State) {
   console.log("Usage:\n");
-  for (let command in state.commands) {
+  for (const command in state.commands) {
     if (state.commands[command].name === "upsert") {
       console.log(
         `${state.commands[command].name} <taskId?>: ${state.commands[command].description}\n`,

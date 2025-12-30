@@ -33,7 +33,7 @@ export function makeJWT(
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + expiresIn,
   };
-  let str = jwt.sign(payload, secret);
+  const str = jwt.sign(payload, secret);
   return str;
 }
 
@@ -51,7 +51,7 @@ export function validateJWT(token: string, secret: string): string {
 
 export function getBearerToken(req: Request): string {
   try {
-    let token = req.get("Authorization")?.split(" ")[1] as string;
+    const token = req.get("Authorization")?.split(" ")[1] as string;
     return token;
   } catch (err) {
     throw new UnauthroizedError("Invalid token");
@@ -59,7 +59,7 @@ export function getBearerToken(req: Request): string {
 }
 
 export async function makeRefreshToken(userId: string, expiresAt: Date) {
-  let hex = crypto.randomBytes(32).toString("hex");
+  const hex = crypto.randomBytes(32).toString("hex");
 
   const [result] = await db
     .insert(refreshTokens)
@@ -90,12 +90,12 @@ export async function revokeRefreshToken(token: string) {
 }
 
 export async function getAPIKey(req: Request) {
-  let header = req.get("Authorization")?.split(" ");
+  const header = req.get("Authorization")?.split(" ");
   try {
     if (!header || header[0] !== "ApiKey" || !header[1]) {
       throw new UnauthroizedError("Invalid API Key");
     }
-    let apiKey = header[1];
+    const apiKey = header[1];
     return apiKey;
   } catch (err) {
     throw new UnauthroizedError("Invalid API Key");

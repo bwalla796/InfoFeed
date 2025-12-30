@@ -1,9 +1,3 @@
-import { relative } from "node:path";
-import { stdin, stdout } from "node:process";
-import Stream from "node:stream";
-import * as readline from "node:readline/promises";
-import { middlewareLogResponses, middlewareMetricsInc } from "../middleware";
-import { handlerStats, handlerResetTasks } from "../api/adminHandlers";
 import * as cmds from "./commands.js";
 import { CLICommand } from "./state.js";
 import { State } from "./state.js";
@@ -34,7 +28,7 @@ export async function loginUser(state: State): Promise<void> {
     if (potential_user) {
       console.log("Please enter your password: ");
       await muteStdout();
-      let input_password = await state.interface.question(
+      const input_password = await state.interface.question(
         "Please enter your password: ",
       );
       await unmuteStdout();
@@ -56,11 +50,11 @@ export async function loginUser(state: State): Promise<void> {
       if (create_new.toLowerCase() === "y") {
         console.log("Please enter a password: ");
         await muteStdout();
-        let input_password = await state.interface.question(
+        const input_password = await state.interface.question(
           "Please enter a password: ",
         );
         await unmuteStdout();
-        let hashed_password = await hashPassword(input_password);
+        const hashed_password = await hashPassword(input_password);
         potential_user = await createUser({
           id: crypto.randomUUID(),
           email: input_email,
@@ -116,8 +110,6 @@ export function cleanInput(input: string): string[] {
     .filter((elem) => elem.length != 0);
 }
 
-const commands = getCommands();
-
 export async function startREPL(state: State): Promise<void> {
   console.log(
     "Welcome to Tasky! Please login. A user profile will be created if one does not already exist.",
@@ -127,14 +119,13 @@ export async function startREPL(state: State): Promise<void> {
   state.interface.prompt();
 
   state.interface.on("line", async (input) => {
-    let cl_inp = cleanInput(input);
+    const cl_inp = cleanInput(input);
     if (cl_inp.length == 0) {
       state.interface.prompt();
       return;
     }
     const commandName = cl_inp[0];
-    const commands = state.commands;
-    const cmd = commands[commandName];
+    const cmd = state.commands[commandName];
     if (commandName == "delete") {
       if (cl_inp.length == 2) {
         state.taskId = cl_inp[1];

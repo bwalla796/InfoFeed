@@ -8,13 +8,13 @@ export async function handlerRefresh(
   next: NextFunction,
 ) {
   try {
-    let token = req.get("Authorization")?.split(" ")[1];
+    const token = req.get("Authorization")?.split(" ")[1];
     if (!token) {
       throw new UnauthroizedError(
         JSON.stringify({ error: "Invalid refresh token" }),
       );
     }
-    let token_db = await getRefreshToken(token);
+    const token_db = await getRefreshToken(token);
     if (
       !token_db ||
       new Date(token_db.expiresAt) < new Date() ||
@@ -24,7 +24,7 @@ export async function handlerRefresh(
         JSON.stringify({ error: "Invalid refresh token" }),
       );
     } else {
-      let new_token = await makeJWT(
+      const new_token = await makeJWT(
         token_db.userId,
         60 * 60,
         config.api.jwt.secret ? config.api.jwt.secret : "",
@@ -42,13 +42,13 @@ export async function handlerRevoke(
   next: NextFunction,
 ) {
   try {
-    let token = req.get("Authorization")?.split(" ")[1];
+    const token = req.get("Authorization")?.split(" ")[1];
     if (!token) {
       throw new UnauthroizedError(
         JSON.stringify({ error: "Invalid refresh token" }),
       );
     }
-    let token_db = await getRefreshToken(token);
+    const token_db = await getRefreshToken(token);
     if (!token_db || token_db.revokedAt) {
       throw new UnauthroizedError(
         JSON.stringify({ error: "Invalid refresh token" }),
