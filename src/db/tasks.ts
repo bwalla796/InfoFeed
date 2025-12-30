@@ -16,11 +16,13 @@ export async function getTasks(id?: string, userId?: string, title?: string) {
   const rows = await db
     .select()
     .from(tasks)
-    .where(and(
-      id ? eq(tasks.id, id) : undefined,
-      userId ? eq(tasks.userId, userId) : undefined,
-      title ? eq(tasks.title, title) : undefined
-    ));
+    .where(
+      and(
+        id ? eq(tasks.id, id) : undefined,
+        userId ? eq(tasks.userId, userId) : undefined,
+        title ? eq(tasks.title, title) : undefined,
+      ),
+    );
   if (id || title) {
     return rows.length > 0 ? rows[0] : null;
   } else {

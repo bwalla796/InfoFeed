@@ -1,7 +1,3 @@
-export async function middlewareLogResponses() {
+export async function middlewareLogResponses() {}
 
-}
-
-export async function middlewareMetricsInc() {
-    
-}
+export async function middlewareMetricsInc() {}

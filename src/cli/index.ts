@@ -1,10 +1,10 @@
 import { relative } from "node:path";
 import { stdin, stdout } from "node:process";
 import Stream from "node:stream";
-import * as readline from 'node:readline/promises';
+import * as readline from "node:readline/promises";
 import { middlewareLogResponses, middlewareMetricsInc } from "../middleware";
 import { handlerStats, handlerResetTasks } from "../api/adminHandlers";
-import * as cmds from "./commands.js"
+import * as cmds from "./commands.js";
 import { CLICommand } from "./state.js";
 import { State } from "./state.js";
 import { getUserByEmail, createUser } from "../db/users.js";
@@ -15,7 +15,9 @@ const originalStdoutWrite = process.stdout.write;
 
 // Function to mute stdout
 export async function muteStdout() {
-  process.stdout.write = () => { return false;};
+  process.stdout.write = () => {
+    return false;
+  };
 }
 
 // Function to unmute stdout
@@ -24,15 +26,22 @@ export async function unmuteStdout() {
 }
 
 export async function loginUser(state: State): Promise<void> {
-  while(!state.userId) {
-    const input_email = await state.interface.question('Please enter your email: ');
+  while (!state.userId) {
+    const input_email = await state.interface.question(
+      "Please enter your email: ",
+    );
     let potential_user = await getUserByEmail(input_email);
     if (potential_user) {
-      console.log('Please enter your password: ')
+      console.log("Please enter your password: ");
       await muteStdout();
-      let input_password = await state.interface.question('Please enter your password: ');
+      let input_password = await state.interface.question(
+        "Please enter your password: ",
+      );
       await unmuteStdout();
-      const pwd_match = await checkPasswordHash(input_password, potential_user.hashedPassword);
+      const pwd_match = await checkPasswordHash(
+        input_password,
+        potential_user.hashedPassword,
+      );
       if (!pwd_match) {
         console.log("Incorrect password. Please try again.");
         continue;
@@ -41,11 +50,15 @@ export async function loginUser(state: State): Promise<void> {
       state.userId = potential_user.id;
     } else {
       console.log("User not found.");
-      const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
-      if (create_new.toLowerCase() === 'y') {
-        console.log('Please enter a password: ')
+      const create_new = await state.interface.question(
+        `Would you like to create a new user profile using ${input_email}? (y/n): `,
+      );
+      if (create_new.toLowerCase() === "y") {
+        console.log("Please enter a password: ");
         await muteStdout();
-        let input_password = await state.interface.question('Please enter a password: ');
+        let input_password = await state.interface.question(
+          "Please enter a password: ",
+        );
         await unmuteStdout();
         let hashed_password = await hashPassword(input_password);
         potential_user = await createUser({
@@ -69,86 +82,98 @@ export function getCommands(): Record<string, CLICommand> {
     exit: {
       name: "exit",
       description: "Exits Tasks",
-      callback: cmds.exit
+      callback: cmds.exit,
     },
     help: {
       name: "help",
       description: "Displays a help message",
-      callback: cmds.help
+      callback: cmds.help,
     },
     list: {
       name: "list",
       description: "Lists tasks",
-      callback: cmds.list
+      callback: cmds.list,
     },
     upsert: {
       name: "upsert",
-      description: "Creates a task or updates an existing task if given a valid ID",
-      callback: cmds.upsert
+      description:
+        "Creates a task or updates an existing task if given a valid ID",
+      callback: cmds.upsert,
     },
     delete: {
       name: "delete",
       description: "Deletes a task by ID",
-      callback: cmds.remove
-    }
-  }
+      callback: cmds.remove,
+    },
+  };
 }
 
 export function cleanInput(input: string): string[] {
-  return input.trim().toLowerCase().split(" ").filter(elem => elem.length != 0);
+  return input
+    .trim()
+    .toLowerCase()
+    .split(" ")
+    .filter((elem) => elem.length != 0);
 }
 
 const commands = getCommands();
 
 export async function startREPL(state: State): Promise<void> {
-  console.log("Welcome to Tasky! Please login. A user profile will be created if one does not already exist.");
+  console.log(
+    "Welcome to Tasky! Please login. A user profile will be created if one does not already exist.",
+  );
   await loginUser(state);
 
   state.interface.prompt();
 
   state.interface.on("line", async (input) => {
-    let cl_inp = cleanInput(input)
-        if (cl_inp.length == 0) {
-          state.interface.prompt()
-          return;
-        }
-        const commandName = cl_inp[0]
-        const commands = state.commands;
-        const cmd = commands[commandName];
-        if(commandName == "delete") {
-          if (cl_inp.length == 2) {
-            state.taskId = cl_inp[1];
-          } else {
-            console.log(
-              `Invalid command arguments: "${commandName}". Format should be "${commandName} {name/ID}"`,
-            );
-            state.interface.prompt();
-            return;
-          }
-        }
-        if(commandName == "upsert") {
-          if (cl_inp.length >= 2) {
-            state.taskId = cl_inp[1];
-          }
-          state.taskTitle = await state.interface.question("Please enter a title for the task:");
-          state.taskDescription = await state.interface.question("Please enter a description for the task:");
-          state.taskStatus = await state.interface.question("Please enter a status for the task:");
-        }
-        if (!cmd) {
-          console.log(
-            `Unknown command: "${commandName}". Type "help" for a list of commands.`,
-          );
-          state.interface.prompt();
-          return;
-        }
-
-        try {
-          await cmd.callback(state);
-        } catch (e) {
-          console.log(e);
-        }
+    let cl_inp = cleanInput(input);
+    if (cl_inp.length == 0) {
+      state.interface.prompt();
+      return;
+    }
+    const commandName = cl_inp[0];
+    const commands = state.commands;
+    const cmd = commands[commandName];
+    if (commandName == "delete") {
+      if (cl_inp.length == 2) {
+        state.taskId = cl_inp[1];
+      } else {
+        console.log(
+          `Invalid command arguments: "${commandName}". Format should be "${commandName} {name/ID}"`,
+        );
         state.interface.prompt();
         return;
-    });
-    
+      }
+    }
+    if (commandName == "upsert") {
+      if (cl_inp.length >= 2) {
+        state.taskId = cl_inp[1];
+      }
+      state.taskTitle = await state.interface.question(
+        "Please enter a title for the task:",
+      );
+      state.taskDescription = await state.interface.question(
+        "Please enter a description for the task:",
+      );
+      state.taskStatus = await state.interface.question(
+        "Please enter a status for the task:",
+      );
+    }
+    if (!cmd) {
+      console.log(
+        `Unknown command: "${commandName}". Type "help" for a list of commands.`,
+      );
+      state.interface.prompt();
+      return;
+    }
+
+    try {
+      await cmd.callback(state);
+    } catch (e) {
+      console.log(e);
+    }
+    state.interface.prompt();
+    return;
+  });
 }

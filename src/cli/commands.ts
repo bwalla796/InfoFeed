@@ -11,19 +11,23 @@ export async function exit(state: State) {
 }
 
 export async function help(state: State) {
-    console.log("Usage:\n");
+  console.log("Usage:\n");
   for (let command in state.commands) {
-      if (state.commands[command].name === "upsert") {
-        console.log(`${state.commands[command].name} <taskId?>: ${state.commands[command].description}\n`);
-      }
-      else if (state.commands[command].name === "delete") {
-        console.log(`${state.commands[command].name} <taskId>: ${state.commands[command].description}\n`);
-      } 
-      else {
-        console.log(`${state.commands[command].name}: ${state.commands[command].description}\n`)
-      }
+    if (state.commands[command].name === "upsert") {
+      console.log(
+        `${state.commands[command].name} <taskId?>: ${state.commands[command].description}\n`,
+      );
+    } else if (state.commands[command].name === "delete") {
+      console.log(
+        `${state.commands[command].name} <taskId>: ${state.commands[command].description}\n`,
+      );
+    } else {
+      console.log(
+        `${state.commands[command].name}: ${state.commands[command].description}\n`,
+      );
+    }
   }
-};
+}
 
 export async function list(state: State) {
   console.log("Listing all tasks:");
@@ -32,29 +36,40 @@ export async function list(state: State) {
     console.log("No tasks found.");
     return;
   }
-  console.log("----------------------------------------------------------------------------");
-  console.log("|  Title               | Description                    | Status     | ID  |");
-  console.log("----------------------------------------------------------------------------"); 
+  console.log(
+    "----------------------------------------------------------------------------",
+  );
+  console.log(
+    "|  Title               | Description                    | Status     | ID  |",
+  );
+  console.log(
+    "----------------------------------------------------------------------------",
+  );
   tasks.forEach((task: NewTask) => {
-    console.log(`| ${task.title}    | ${task.description}   | ${task.status} | ${task.id} |`);
+    console.log(
+      `| ${task.title}    | ${task.description}   | ${task.status} | ${task.id} |`,
+    );
   });
 }
 
 export async function upsert(state: State) {
-  if(!state.userId) {
+  if (!state.userId) {
     console.log("User ID is required to create or update a task.");
     return;
   }
-  
+
   let upsertedTask: NewTask;
   const taskMatches = await getTasks(undefined, state.userId, state.taskTitle);
-  if(taskMatches) {
+  if (taskMatches) {
     const id = Array.isArray(taskMatches) ? taskMatches[0].id : taskMatches.id;
-    upsertedTask = await state.db.updateTask({
-      title: state.taskTitle,
-      description: state.taskDescription,
-      status: state.taskStatus,
-    }, id);
+    upsertedTask = await state.db.updateTask(
+      {
+        title: state.taskTitle,
+        description: state.taskDescription,
+        status: state.taskStatus,
+      },
+      id,
+    );
   } else {
     upsertedTask = await state.db.createTask({
       id: crypto.randomUUID(),
@@ -65,12 +80,11 @@ export async function upsert(state: State) {
     });
   }
 
-  if(!taskMatches) {
+  if (!taskMatches) {
     console.log(`Task created with ID: ${upsertedTask.id}`);
   } else {
     console.log(`Task with ID ${upsertedTask.id} has been updated.`);
   }
-
 }
 
 export async function remove(state: State) {
