@@ -1,11 +1,10 @@
 import { eq, and } from "drizzle-orm";
-import { db, assertDbConnection } from "../main.js";
+import { db } from "../main.js";
 import { tasks, NewTask } from "./schema.js";
 import { UUID } from "node:crypto";
 
 export async function createTask(task: NewTask) {
-  assertDbConnection();
-  const rows = await db!.insert(tasks).values(task).returning();
+  const rows = await db.insert(tasks).values(task).returning();
   if (rows.length === 0) {
     throw new Error("Failed to create task");
   }
@@ -14,8 +13,7 @@ export async function createTask(task: NewTask) {
 }
 
 export async function getTasks(id?: string, userId?: string, title?: string) {
-  assertDbConnection();
-  const rows = await db!
+  const rows = await db
     .select()
     .from(tasks)
     .where(and(
@@ -31,11 +29,10 @@ export async function getTasks(id?: string, userId?: string, title?: string) {
 }
 
 export async function updateTask(updates: Partial<NewTask> = {}, id?: string) {
-  assertDbConnection();
   if (!id) {
     throw new Error("Task ID is required for update");
   }
-  const rows = await db!
+  const rows = await db
     .update(tasks)
     .set(updates)
     .where(eq(tasks.id, id))
@@ -48,12 +45,11 @@ export async function updateTask(updates: Partial<NewTask> = {}, id?: string) {
 }
 
 export async function deleteTask(id?: string) {
-  assertDbConnection();
   if (!id) {
-    const rows = await db!.delete(tasks).returning();
+    const rows = await db.delete(tasks).returning();
     return rows;
   }
-  const rows = await db!.delete(tasks).where(eq(tasks.id, id)).returning();
+  const rows = await db.delete(tasks).where(eq(tasks.id, id)).returning();
   if (rows.length === 0) {
     throw new Error("Failed to delete task");
   }

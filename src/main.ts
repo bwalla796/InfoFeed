@@ -16,14 +16,11 @@ function main() {
 }
 
 //Initialize database connection
-export const client = process.env.DB_FILE_NAME ? createClient({ url: process.env.DB_FILE_NAME }) : null;
-export const db = client ? drizzle({ client }) : null;
-
-export function assertDbConnection() {
-  if (!db) {
-    throw new Error("Database connection is not available");
-  }
+if (!process.env.DB_FILE_NAME) {
+  throw new Error("DB_FILE_NAME environment variable is not set");
 }
+export const client = createClient({ url: process.env.DB_FILE_NAME });
+export const db = drizzle({ client });
 
 
 //API routes

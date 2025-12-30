@@ -1,8 +1,7 @@
 import { eq } from "drizzle-orm";
-import { db, assertDbConnection } from "../main.js";
+import { db } from "../main.js";
 import { users } from "./schema.js";
 export async function createUser(user) {
-    assertDbConnection();
     const rows = await db.insert(users).values(user).returning();
     if (rows.length === 0) {
         throw new Error("Failed to create user");
@@ -10,7 +9,6 @@ export async function createUser(user) {
     return rows[0];
 }
 export async function getUser(apiKey) {
-    assertDbConnection();
     const rows = await db
         .select()
         .from(users)
@@ -18,7 +16,6 @@ export async function getUser(apiKey) {
     return rows.length > 0 ? rows[0] : null;
 }
 export async function getUserByEmail(email) {
-    assertDbConnection();
     const rows = await db
         .select()
         .from(users)

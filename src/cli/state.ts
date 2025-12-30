@@ -29,10 +29,10 @@ export type CLICommand = {
 export function initState(): State {
     const rl = {
       interface:  createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            prompt: "Tasky >"
-        }),
+          input: process.stdin,
+          output: process.stdout,
+          prompt: "Tasky >"
+      }),
       commands: getCommands(),
       userId: undefined,
       taskId: undefined,

@@ -14,13 +14,11 @@ function main() {
     startREPL(state);
 }
 //Initialize database connection
+if (!process.env.DB_FILE_NAME) {
+    throw new Error("DB_FILE_NAME environment variable is not set");
+}
 export const client = createClient({ url: process.env.DB_FILE_NAME });
 export const db = drizzle({ client });
-export function assertDbConnection() {
-    if (!db) {
-        throw new Error("Database connection is not available");
-    }
-}
 //API routes
 const app = express();
 app.use(middlewareLogResponses);

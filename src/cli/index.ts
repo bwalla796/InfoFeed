@@ -10,13 +10,28 @@ import { State } from "./state.js";
 import { getUserByEmail, createUser } from "../db/users.js";
 import { hashPassword, checkPasswordHash } from "../auth.js";
 import crypto from "crypto";
+// Save the original write function
+const originalStdoutWrite = process.stdout.write;
+
+// Function to mute stdout
+export async function muteStdout() {
+  process.stdout.write = () => { return false;};
+}
+
+// Function to unmute stdout
+export async function unmuteStdout() {
+  process.stdout.write = originalStdoutWrite;
+}
 
 export async function loginUser(state: State): Promise<void> {
   while(!state.userId) {
     const input_email = await state.interface.question('Please enter your email: ');
     let potential_user = await getUserByEmail(input_email);
     if (potential_user) {
+      console.log('Please enter your password: ')
+      await muteStdout();
       let input_password = await state.interface.question('Please enter your password: ');
+      await unmuteStdout();
       const pwd_match = await checkPasswordHash(input_password, potential_user.hashedPassword);
       if (!pwd_match) {
         console.log("Incorrect password. Please try again.");
@@ -28,7 +43,10 @@ export async function loginUser(state: State): Promise<void> {
       console.log("User not found.");
       const create_new = await state.interface.question(`Would you like to create a new user profile using ${input_email}? (y/n): `);
       if (create_new.toLowerCase() === 'y') {
+        console.log('Please enter a password: ')
+        await muteStdout();
         let input_password = await state.interface.question('Please enter a password: ');
+        await unmuteStdout();
         let hashed_password = await hashPassword(input_password);
         potential_user = await createUser({
           id: crypto.randomUUID(),

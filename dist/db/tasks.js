@@ -1,8 +1,7 @@
 import { eq, and } from "drizzle-orm";
-import { db, assertDbConnection } from "../main.js";
+import { db } from "../main.js";
 import { tasks } from "./schema.js";
 export async function createTask(task) {
-    assertDbConnection();
     const rows = await db.insert(tasks).values(task).returning();
     if (rows.length === 0) {
         throw new Error("Failed to create task");
@@ -10,7 +9,6 @@ export async function createTask(task) {
     return rows[0];
 }
 export async function getTasks(id, userId, title) {
-    assertDbConnection();
     const rows = await db
         .select()
         .from(tasks)
@@ -23,7 +21,6 @@ export async function getTasks(id, userId, title) {
     }
 }
 export async function updateTask(updates = {}, id) {
-    assertDbConnection();
     if (!id) {
         throw new Error("Task ID is required for update");
     }
@@ -38,7 +35,6 @@ export async function updateTask(updates = {}, id) {
     return rows[0];
 }
 export async function deleteTask(id) {
-    assertDbConnection();
     if (!id) {
         const rows = await db.delete(tasks).returning();
         return rows;
