@@ -1,3 +1,6 @@
+[![cd](https://github.com/bwalla796/InfoFeed/actions/workflows/cd.yml/badge.svg?branch=main)](https://github.com/bwalla796/Tasky/actions/workflows/cd.yml)
+[![ci](https://github.com/bwalla796/InfoFeed/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bwalla796/Tasky/actions/workflows/ci.yml)
+
 # Tasky
 
 ## A task manager CLI and API to keep track of your personal projects
