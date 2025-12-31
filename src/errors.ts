@@ -90,6 +90,8 @@ export function handlerError(
       error: "Something went wrong on our end",
     });
   }
+
+  next();
 }
 
 export class BadRequestError extends Error {

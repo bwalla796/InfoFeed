@@ -1,7 +1,7 @@
 import { startREPL } from "./cli/index.js";
 import { initState } from "./cli/state.js";
 import express from "express";
-import { middlewareLogResponses, middlewareMetricsInc } from "./middleware.js";
+import { middlewareLogResponses } from "./api/middleware.js";
 import { handlerStats, handlerResetTasks } from "./api/adminHandlers.js";
 import {
   handlerGetTasks,
@@ -36,7 +36,7 @@ app.use(express.json());
 app.get("/admin/metrics", middlewareLogResponses, handlerStats);
 app.post("/admin/reset", middlewareLogResponses, handlerResetTasks);
 
-app.get("/api/tasks/:id", middlewareLogResponses, handlerGetTasks);
+app.get("/api/tasks{/:id}", middlewareLogResponses, handlerGetTasks);
 app.post("/api/tasks", middlewareLogResponses, handlerUpsertTasks);
 app.delete("/api/tasks/:id", middlewareLogResponses, handlerDeleteTasks);
 app.use(handlerError);

@@ -8,7 +8,7 @@ export async function handlerGetTasks(
 ) {
   const tasks = await getTasks();
 
-  res.json(tasks);
+  res.status(200).json(tasks);
   next();
 }
 

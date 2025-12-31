@@ -5,9 +5,8 @@ import { UnauthroizedError } from "./errors.js";
 import type { Request } from "express";
 import crypto from "crypto";
 import { db } from "./main.js";
-import { NewRefreshToken, refreshTokens } from "./db/schema.js";
+import { refreshTokens } from "./db/schema.js";
 import { sql, eq } from "drizzle-orm";
-import e from "express";
 
 export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password);
@@ -28,7 +27,7 @@ export function makeJWT(
   secret: string,
 ): string {
   const payload: payload = {
-    iss: "chirpy",
+    iss: "tasky",
     sub: userId,
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + expiresIn,
@@ -40,12 +39,12 @@ export function makeJWT(
 export function validateJWT(token: string, secret: string): string {
   try {
     const decoded = jwt.verify(token, secret) as JwtPayload;
-    if (!decoded.iss || decoded.iss !== "chirpy" || !decoded.sub) {
+    if (!decoded.iss || decoded.iss !== "tasky" || !decoded.sub) {
       throw new UnauthroizedError("Invalid token");
     }
     return decoded.sub as string;
   } catch (err) {
-    throw new UnauthroizedError("Invalid token");
+    throw new UnauthroizedError(`Invalid token: ${err}`);
   }
 }
 
@@ -54,7 +53,7 @@ export function getBearerToken(req: Request): string {
     const token = req.get("Authorization")?.split(" ")[1] as string;
     return token;
   } catch (err) {
-    throw new UnauthroizedError("Invalid token");
+    throw new UnauthroizedError(`Invalid token: ${err}`);
   }
 }
 
@@ -98,6 +97,6 @@ export async function getAPIKey(req: Request) {
     const apiKey = header[1];
     return apiKey;
   } catch (err) {
-    throw new UnauthroizedError("Invalid API Key");
+    throw new UnauthroizedError(`Invalid API Key: ${err}`);
   }
 }
