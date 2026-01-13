@@ -5,7 +5,7 @@
 
 ## A task manager CLI and API to keep track of your personal projects
 
-### Why did I build Tasky?
+### Motivation
 
 For me, using enterprise level task managers to be cumbersome and other native notepads to be clunky and getting in the way.
 I figured since, I spend alot of time in the terminal, having a task list that can be listed and updated a command away to be
